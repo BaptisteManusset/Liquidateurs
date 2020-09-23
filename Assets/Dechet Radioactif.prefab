@@ -14,9 +14,10 @@ GameObject:
   - component: {fileID: 2145011271312591337}
   - component: {fileID: 7487443838465632525}
   - component: {fileID: 6634637830186544026}
+  - component: {fileID: 4149747451429884062}
   m_Layer: 0
   m_Name: Dechet Radioactif
-  m_TagString: Untagged
+  m_TagString: Radioactif
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4817,3 +4818,16 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!135 &4149747451429884062
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2145011271312591330}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 4
+  m_Center: {x: 0, y: 0, z: 0}
