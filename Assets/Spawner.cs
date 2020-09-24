@@ -12,22 +12,29 @@ public class Spawner : MonoBehaviour
     void Start()
     {
         SpawnStack();
+
+        InvokeRepeating(nameof(Spawn), 1, 2);
     }
     [ContextMenu("Spawn Stack")]
     private void SpawnStack()
     {
         for (int i = 0; i < quantity; i++)
         {
-            Vector3 pos = new Vector3(Random.Range(-radius, radius), 0, Random.Range(-radius, radius));
-
-            pos += transform.position;
-            Instantiate(dechet, pos, Quaternion.identity);
+            Spawn();
         }
+    }
+
+    private void Spawn()
+    {
+        Vector3 pos = new Vector3(Random.Range(-radius, radius), 0, Random.Range(-radius, radius));
+
+        pos += transform.position;
+        Instantiate(dechet, pos, Quaternion.identity);
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
-        Gizmos.DrawCube(transform.position, new Vector3(radius,0, radius) * 2);
+        Gizmos.DrawCube(transform.position, new Vector3(radius, 0, radius) * 2);
     }
 }

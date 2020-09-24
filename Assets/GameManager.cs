@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Serialization;
 
 public class GameManager : MonoBehaviour
 {
@@ -36,20 +37,20 @@ public class GameManager : MonoBehaviour
     #endregion
 
     [Header("Position")]
-    public Transform _stock;
-    public static Transform Stock
+    [FormerlySerializedAs("_stock")] public Transform _destination;
+    public static Transform Destination
     {
-        set { GameManager.instance._stock = value; }
-        get { return GameManager.instance._stock; }
+        set { GameManager.instance._destination = value; }
+        get { return GameManager.instance._destination; }
     }
 
-
+    #region singleton
     private void Awake()
     {
         if (instance == null)
             instance = this;
     }
-
+    #endregion
 
 
 
@@ -69,7 +70,7 @@ public class GameManager : MonoBehaviour
     public static void IneedAMedic(Liquidateur liquidateur)
     {
 
-        if(GameManager.RequireAssistance.Contains(liquidateur) == false)
+        if (GameManager.RequireAssistance.Contains(liquidateur) == false)
             GameManager.RequireAssistance.Add(liquidateur);
     }
     public static void IdontNeedAMedic(Liquidateur liquidateur)

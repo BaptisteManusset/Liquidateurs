@@ -329,7 +329,7 @@ MonoBehaviour:
   _collectables: []
   _liquidateurs: []
   _requireAssistance: []
-  _stock: {fileID: 242354389}
+  _destination: {fileID: 242354389}
 --- !u!4 &481645741
 Transform:
   m_ObjectHideFlags: 0
@@ -722,7 +722,7 @@ PrefabInstance:
     - target: {fileID: 2221263206255087501, guid: 7d12441f139421343aa2aeefdf62f3db,
         type: 3}
       propertyPath: m_Name
-      value: Stock
+      value: "D\xE9pot"
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7d12441f139421343aa2aeefdf62f3db, type: 3}

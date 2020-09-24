@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using TMPro;
 
 public class Liquidateur : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class Liquidateur : MonoBehaviour
     [SerializeField] float iradiation = 0;
 
     ParticleSystem particle;
+    [SerializeField] TextMeshPro text;
 
     public enum State
     {
@@ -24,9 +26,6 @@ public class Liquidateur : MonoBehaviour
     public State state = State.wait;
 
     public int stock;
-
-
-
     private void OnEnable()
     {
         GameManager.Liquidateurs.Add(this);
@@ -35,6 +34,11 @@ public class Liquidateur : MonoBehaviour
     {
         GameManager.Liquidateurs.Remove(this);
         GameManager.RequireAssistance.Remove(this);
+    }
+
+    private void Awake()
+    {
+        text = GetComponentInChildren<TextMeshPro>();
     }
     private void Start()
     {
@@ -58,10 +62,10 @@ public class Liquidateur : MonoBehaviour
         }
         else
         {
-            if (stock >= 10)
+            if (stock > 0)
             {
                 state = State.ramene;
-                target = GameManager.Stock;
+                target = GameManager.Destination;
 
             }
             else
@@ -87,6 +91,8 @@ public class Liquidateur : MonoBehaviour
         state = State.interact;
         Interactable interactable = target.GetComponent<Interactable>();
         interactable.Interact(this);
+        text.text = stock.ToString();
+
         target = null;
         yield return new WaitForSeconds(.2f);
         state = State.vachercher;
@@ -120,7 +126,7 @@ public class Liquidateur : MonoBehaviour
         if (GameManager.ElementsToCollect.Count <= 0)
         {
             Debug.LogError("Aucun collectables disponibles");
-            target = GameManager.Stock;
+            target = GameManager.Destination;
             state = State.idle;
 
             //GameManager.ResetGame();

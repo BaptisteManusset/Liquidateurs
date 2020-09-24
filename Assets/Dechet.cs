@@ -27,16 +27,11 @@ public class Dechet : Interactable
 
     public override void Interact(Liquidateur li)
     {
-        Debug.Log($"Stock actuel{li.stock}");
-
-
         li.stock += quantity;
-        quantity = 0;
 
         text.text = quantity.ToString();
 
-
-
+        quantity = 0;
     }
 
 
