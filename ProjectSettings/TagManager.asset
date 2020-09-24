@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 2
   tags:
   - Radioactif
+  - Hopital
   layers:
   - Default
   - TransparentFX

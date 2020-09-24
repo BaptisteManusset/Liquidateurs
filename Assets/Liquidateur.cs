@@ -4,26 +4,11 @@ using System.Linq;
 using UnityEngine;
 using TMPro;
 
-public class Liquidateur : MonoBehaviour
+public class Liquidateur : Moveable
 {
-    [SerializeField] Transform target;
-    [SerializeField] float speed = 5;
-    [SerializeField] float iradiation = 0;
 
-    ParticleSystem particle;
-    [SerializeField] TextMeshPro text;
 
-    public enum State
-    {
-        wait = 0,
-        ramene,
-        vachercher,
-        down,
-        idle,
-        interact
-    }
 
-    public State state = State.wait;
 
     public int stock;
     private void OnEnable()
@@ -33,20 +18,12 @@ public class Liquidateur : MonoBehaviour
     private void OnDestroy()
     {
         GameManager.Liquidateurs.Remove(this);
-        GameManager.RequireAssistance.Remove(this);
+        GameManager.RequireAssistance.Remove(gameObject);
     }
 
-    private void Awake()
-    {
-        text = GetComponentInChildren<TextMeshPro>();
-    }
-    private void Start()
-    {
-        FindTarget();
-    }
     private void FixedUpdate()
     {
-        if (state == State.down || state == State.interact) return;
+        if (state == State.malade || state == State.interagit) return;
 
         if (target)
         {
@@ -64,7 +41,7 @@ public class Liquidateur : MonoBehaviour
         {
             if (stock > 0)
             {
-                state = State.ramene;
+                state = State.revient;
                 target = GameManager.Destination;
 
             }
@@ -74,104 +51,50 @@ public class Liquidateur : MonoBehaviour
             }
         }
 
-
-
-        if (iradiation >= 2)
-        {
-            KO();
-        }
-        ParticleSystem particle = GetComponent<ParticleSystem>();
-        var main = particle.main;
-
-        main.startSize = iradiation / 2;
+        UpdateRadiation();
     }
 
-    private IEnumerator Interact()
+
+
+    protected override IEnumerator Interact()
     {
-        state = State.interact;
+        state = State.interagit;
         Interactable interactable = target.GetComponent<Interactable>();
         interactable.Interact(this);
-        text.text = stock.ToString();
 
         target = null;
         yield return new WaitForSeconds(.2f);
         state = State.vachercher;
         interactable.EndInteract();
-
-    }
-
-    [ContextMenu("Je suis Ko")]
-    private void KO()
-    {
-        state = State.down;
-        GetComponent<Renderer>().material.color = Color.green;
-
-        GameManager.IneedAMedic(this);
-        //GameManager.ResetGame();
-    }
-
-    [ContextMenu("Je suis guéri")]
-    public void Heal()
-    {
-        GameManager.IdontNeedAMedic(this);
-
-        state = State.idle;
-        GetComponent<Renderer>().material.color = Color.white;
-        iradiation = 0;
     }
 
 
-    void FindTarget()
+
+
+    protected override void FindTarget()
     {
         if (GameManager.ElementsToCollect.Count <= 0)
         {
-            Debug.LogError("Aucun collectables disponibles");
+            //Debug.LogError("Aucun collectables disponibles");
             target = GameManager.Destination;
-            state = State.idle;
-
-            //GameManager.ResetGame();
+            state = State.attent;
             return;
         }
-        target = Tools.FindNearestObject(GameManager.ElementsToCollect, gameObject)[0].transform;
+        target = Tools.FindNearestObject(GameManager.ElementsToCollect, gameObject).transform;
         target.GetComponent<Dechet>().EnableToggle();
         state = State.vachercher;
     }
 
-
-
-
-    private void Move()
+    override protected void KO()
     {
-        if (target == null)
-        {
-            Debug.LogError("Missing Target");
-            return;
-        }
-
-        float step = speed * Time.deltaTime;
-        transform.position = Vector3.MoveTowards(transform.position, target.position, step);
-        transform.LookAt(target.position);
-
-
+        GameManager.IneedAMedic(gameObject);
+        base.KO();
     }
 
 
-    private void OnDrawGizmos()
+    override public void Heal()
     {
-        if (target == null) return;
-
-        Gizmos.DrawLine(transform.position, target.position);
-    }
-
-
-    private void OnTriggerStay(Collider other)
-    {
-
-        if (other.gameObject.CompareTag("Radioactif"))
-        {
-            if (state == State.down) return;
-
-            iradiation += 0.1f * Time.deltaTime;
-        }
+        GameManager.IdontNeedAMedic(gameObject);
+        base.Heal();
     }
 }

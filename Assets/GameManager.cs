@@ -8,40 +8,57 @@ public class GameManager : MonoBehaviour
 {
 
 
-    #region variables
     public static GameManager instance;
 
-
+    #region COLLECTABLES
     public List<GameObject> _collectables;
     public static List<GameObject> ElementsToCollect
     {
         set { GameManager.instance._collectables = value; }
         get { return GameManager.instance._collectables; }
     }
+    #endregion
 
-    public List<Liquidateur> _liquidateurs;
-    public static List<Liquidateur> Liquidateurs
+    #region LIQUIDATEURS
+    public List<Moveable> _liquidateurs;
+    public static List<Moveable> Liquidateurs
     {
         set { GameManager.instance._liquidateurs = value; }
         get { return GameManager.instance._liquidateurs; }
     }
+    #endregion
 
 
+    #region MEDICS
+    public List<Moveable> _medics;
+    public static List<Moveable> Medics
+    {
+        set { GameManager.instance._medics = value; }
+        get { return GameManager.instance._medics; }
+    }
+    #endregion
 
-    public List<Liquidateur> _requireAssistance;
-    public static List<Liquidateur> RequireAssistance
+    #region REQUIRE ASSISTANCE
+    public List<GameObject> _requireAssistance;
+    public static List<GameObject> RequireAssistance
     {
         set { GameManager.instance._requireAssistance = value; }
         get { return GameManager.instance._requireAssistance; }
     }
     #endregion
 
-    [Header("Position")]
-    [FormerlySerializedAs("_stock")] public Transform _destination;
+    [Header("Position")]public Transform _destination;
     public static Transform Destination
     {
         set { GameManager.instance._destination = value; }
         get { return GameManager.instance._destination; }
+    }
+    
+    public Transform _hopital;
+    public static Transform Hopital
+    {
+        set { GameManager.instance._hopital = value; }
+        get { return GameManager.instance._hopital; }
     }
 
     #region singleton
@@ -67,13 +84,13 @@ public class GameManager : MonoBehaviour
     }
 
 
-    public static void IneedAMedic(Liquidateur liquidateur)
+    public static void IneedAMedic(GameObject liquidateur)
     {
 
         if (GameManager.RequireAssistance.Contains(liquidateur) == false)
             GameManager.RequireAssistance.Add(liquidateur);
     }
-    public static void IdontNeedAMedic(Liquidateur liquidateur)
+    public static void IdontNeedAMedic(GameObject liquidateur)
     {
         if (GameManager.RequireAssistance.Contains(liquidateur) == true)
             GameManager.RequireAssistance.Remove(liquidateur);

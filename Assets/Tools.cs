@@ -16,10 +16,12 @@ public static class Tools
             GameManager.ElementsToCollect.Remove(value);
     }
 
-    public static List<GameObject> FindNearestObject(List<GameObject> list, GameObject origin)
+    public static GameObject FindNearestObject(List<GameObject> list, GameObject origin)
     {
         List<GameObject> results = list.OrderBy(x => Vector3.Distance(origin.transform.position, x.transform.position)).ToList();
-        return results;
+
+
+        return results.Count > 0 ? results[0] : null;
     }
 
 

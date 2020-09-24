@@ -9,11 +9,13 @@ public class Spawner : MonoBehaviour
 
     [SerializeField] int quantity = 10;
 
+    [SerializeField] float delay = 1;
+
     void Start()
     {
         SpawnStack();
 
-        InvokeRepeating(nameof(Spawn), 1, 2);
+        InvokeRepeating(nameof(Spawn), 1, delay);
     }
     [ContextMenu("Spawn Stack")]
     private void SpawnStack()
@@ -26,9 +28,12 @@ public class Spawner : MonoBehaviour
 
     private void Spawn()
     {
+        if (GameManager.ElementsToCollect.Count >= 20) return;
+
         Vector3 pos = new Vector3(Random.Range(-radius, radius), 0, Random.Range(-radius, radius));
 
         pos += transform.position;
+        pos.y = 0;
         Instantiate(dechet, pos, Quaternion.identity);
     }
 
