@@ -17,13 +17,11 @@ public class Liquidateur : MonoBehaviour
         ramene,
         vachercher,
         down,
-        idle
+        idle,
+        interact
     }
 
     public State state = State.wait;
-
-
-    public bool downed = false;
 
     public int stock;
 
@@ -36,6 +34,7 @@ public class Liquidateur : MonoBehaviour
     private void OnDestroy()
     {
         GameManager.Liquidateurs.Remove(this);
+        GameManager.RequireAssistance.Remove(this);
     }
     private void Start()
     {
@@ -43,7 +42,7 @@ public class Liquidateur : MonoBehaviour
     }
     private void FixedUpdate()
     {
-        if (state == State.down) return;
+        if (state == State.down || state == State.interact) return;
 
         if (target)
         {
@@ -54,10 +53,7 @@ public class Liquidateur : MonoBehaviour
             }
             else
             {
-                Debug.Log("arrivé a destination");
-                Interactable interactable = target.GetComponent<Interactable>();
-                interactable.Interact(this);
-                target = null;
+                StartCoroutine(nameof(Interact));
             }
         }
         else
@@ -86,14 +82,38 @@ public class Liquidateur : MonoBehaviour
         main.startSize = iradiation / 2;
     }
 
+    private IEnumerator Interact()
+    {
+        state = State.interact;
+        Interactable interactable = target.GetComponent<Interactable>();
+        interactable.Interact(this);
+        target = null;
+        yield return new WaitForSeconds(.2f);
+        state = State.vachercher;
+        interactable.EndInteract();
+
+    }
+
+    [ContextMenu("Je suis Ko")]
     private void KO()
     {
         state = State.down;
         GetComponent<Renderer>().material.color = Color.green;
 
-
-        GameManager.ResetGame();
+        GameManager.IneedAMedic(this);
+        //GameManager.ResetGame();
     }
+
+    [ContextMenu("Je suis guéri")]
+    public void Heal()
+    {
+        GameManager.IdontNeedAMedic(this);
+
+        state = State.idle;
+        GetComponent<Renderer>().material.color = Color.white;
+        iradiation = 0;
+    }
+
 
     void FindTarget()
     {
@@ -103,10 +123,11 @@ public class Liquidateur : MonoBehaviour
             target = GameManager.Stock;
             state = State.idle;
 
-            GameManager.ResetGame();
+            //GameManager.ResetGame();
             return;
         }
         target = Tools.FindNearestObject(GameManager.ElementsToCollect, gameObject)[0].transform;
+        target.GetComponent<Dechet>().EnableToggle();
         state = State.vachercher;
     }
 
@@ -123,6 +144,9 @@ public class Liquidateur : MonoBehaviour
 
         float step = speed * Time.deltaTime;
         transform.position = Vector3.MoveTowards(transform.position, target.position, step);
+        transform.LookAt(target.position);
+
+
     }
 
 

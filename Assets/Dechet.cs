@@ -1,11 +1,62 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Dechet : Interactable
 {
 
-    public int Health = 5;
+    public int quantity = 5;
+    public bool isTargeted = false;
+    TextMeshPro text;
+
+    private void Awake()
+    {
+        quantity = Random.Range(4, 10);
+        text = GetComponentInChildren<TextMeshPro>();
+
+        text.text = quantity.ToString();
+
+    }
+
+    public void EnableToggle()
+    {
+        isTargeted = true;
+        gameObject.RemoveElementTocollect();
+    }
+
+    public override void Interact(Liquidateur li)
+    {
+        Debug.Log($"Stock actuel{li.stock}");
+
+
+        li.stock += quantity;
+        quantity = 0;
+
+        text.text = quantity.ToString();
+
+
+
+    }
+
+
+    public override void EndInteract()
+    {
+        isTargeted = false;
+
+        if (quantity <= 0)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            gameObject.AddElementTocollect();
+        }
+    }
+
+
+
+
 
     private void OnEnable()
     {
@@ -17,10 +68,5 @@ public class Dechet : Interactable
         gameObject.RemoveElementTocollect();
     }
 
-    public override void Interact(Liquidateur li)
-    {
-        li.stock += 5;
 
-        Destroy(gameObject);
-    }
 }

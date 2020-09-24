@@ -5,6 +5,9 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
+
+
+    #region variables
     public static GameManager instance;
 
 
@@ -23,6 +26,16 @@ public class GameManager : MonoBehaviour
     }
 
 
+
+    public List<Liquidateur> _requireAssistance;
+    public static List<Liquidateur> RequireAssistance
+    {
+        set { GameManager.instance._requireAssistance = value; }
+        get { return GameManager.instance._requireAssistance; }
+    }
+    #endregion
+
+    [Header("Position")]
     public Transform _stock;
     public static Transform Stock
     {
@@ -50,5 +63,18 @@ public class GameManager : MonoBehaviour
     public static void ResetGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+
+    public static void IneedAMedic(Liquidateur liquidateur)
+    {
+
+        if(GameManager.RequireAssistance.Contains(liquidateur) == false)
+            GameManager.RequireAssistance.Add(liquidateur);
+    }
+    public static void IdontNeedAMedic(Liquidateur liquidateur)
+    {
+        if (GameManager.RequireAssistance.Contains(liquidateur) == true)
+            GameManager.RequireAssistance.Remove(liquidateur);
     }
 }
