@@ -10,6 +10,10 @@ public class GameManager : MonoBehaviour
 
     public static GameManager instance;
 
+    public float radiationMultiplier = 0.1f;
+
+
+
     #region COLLECTABLES
     public List<GameObject> _collectables;
     public static List<GameObject> ElementsToCollect
@@ -55,6 +59,7 @@ public class GameManager : MonoBehaviour
     }
     
     public Transform _hopital;
+
     public static Transform Hopital
     {
         set { GameManager.instance._hopital = value; }
@@ -68,6 +73,7 @@ public class GameManager : MonoBehaviour
             instance = this;
     }
     #endregion
+
 
 
 

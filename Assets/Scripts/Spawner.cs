@@ -18,28 +18,33 @@ public class Spawner : MonoBehaviour
         InvokeRepeating(nameof(Spawn), 1, delay);
     }
     [ContextMenu("Spawn Stack")]
-    private void SpawnStack()
+    public void SpawnStack(bool force = false)
     {
         for (int i = 0; i < quantity; i++)
         {
-            Spawn();
+            Spawn(force);
         }
     }
 
+
     private void Spawn()
     {
-        if (GameManager.ElementsToCollect.Count >= 20) return;
+        Spawn(false);
+    }
+    private void Spawn(bool force = false)
+    {
+        if (GameManager.ElementsToCollect.Count >= 20 && force == false) return;
 
         Vector3 pos = new Vector3(Random.Range(-radius, radius), 0, Random.Range(-radius, radius));
 
         pos += transform.position;
         pos.y = 0;
-        Instantiate(dechet, pos, Quaternion.identity);
+        Instantiate(dechet, pos, Quaternion.identity, transform);
     }
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
-        Gizmos.DrawCube(transform.position, new Vector3(radius, 0, radius) * 2);
+        Gizmos.DrawWireCube(transform.position, new Vector3(radius, 0, radius) * 2);
     }
 }

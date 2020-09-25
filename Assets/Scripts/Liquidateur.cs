@@ -6,11 +6,10 @@ using TMPro;
 
 public class Liquidateur : Moveable
 {
-
-
-
-
+    [Header("Inventory")]
     public int stock;
+    public int stockMax = 10;
+
     private void OnEnable()
     {
         GameManager.Liquidateurs.Add(this);
@@ -53,9 +52,6 @@ public class Liquidateur : Moveable
 
         UpdateRadiation();
     }
-
-
-
     protected override IEnumerator Interact()
     {
         state = State.interagit;
@@ -67,33 +63,33 @@ public class Liquidateur : Moveable
         state = State.vachercher;
         interactable.EndInteract();
     }
-
-
-
-
     protected override void FindTarget()
     {
-        if (GameManager.ElementsToCollect.Count <= 0)
+        if (GameManager.ElementsToCollect.Count <= stockMax)
         {
-            //Debug.LogError("Aucun collectables disponibles");
             target = GameManager.Destination;
             state = State.attent;
+            animator.SetTrigger("idle");
             return;
         }
         target = Tools.FindNearestObject(GameManager.ElementsToCollect, gameObject).transform;
         target.GetComponent<Dechet>().EnableToggle();
         state = State.vachercher;
+        animator.SetTrigger("walk");
     }
 
     override protected void KO()
     {
         GameManager.IneedAMedic(gameObject);
+
         base.KO();
+
     }
 
 
     override public void Heal()
     {
+
         GameManager.IdontNeedAMedic(gameObject);
         base.Heal();
     }

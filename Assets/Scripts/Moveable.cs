@@ -4,8 +4,11 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
+
+//classe de base qui controle gere le deplacement et la logique commune aux liquidateurs et aux medecins
 public class Moveable : MonoBehaviour
 {
+    //state machine
     #region State
     public enum State
     {
@@ -15,21 +18,25 @@ public class Moveable : MonoBehaviour
         attent,
         interagit
     }
-
+    [Header("Etat")]
     public State state = State.attent;
     #endregion
 
-    [SerializeField] protected float iradiation = 0;
 
-    [SerializeField] protected Transform target;
-    [SerializeField] protected float speed = 5;
+    [Header("Radiation")]
+    [SerializeField] protected float iradiation = 0;
     [SerializeField] protected float maxRadiation = 2;
 
-    
+    [Header("Movement")]
+    [SerializeField] protected Transform target;
+    [SerializeField] protected float speed = 5;
+
+
 
 
     protected TextMeshPro text;
     protected ParticleSystem particle;
+    protected Animator animator;
 
 
 
@@ -37,6 +44,7 @@ public class Moveable : MonoBehaviour
     protected virtual void Awake()
     {
         text = GetComponentInChildren<TextMeshPro>();
+        animator = GetComponentInChildren<Animator>();
     }
     protected virtual void Start()
     {
@@ -47,7 +55,7 @@ public class Moveable : MonoBehaviour
 
     protected virtual void FindTarget()
     {
-        Debug.Log(gameObject.name + ": find Target");
+        animator.SetBool("idle", false);
     }
 
 
@@ -65,7 +73,7 @@ public class Moveable : MonoBehaviour
     }
 
 
-
+    //affiche des informations de debug
     protected void OnDrawGizmos()
     {
         if (target == null) return;
@@ -74,16 +82,33 @@ public class Moveable : MonoBehaviour
     }
 
 
-    protected void OnTriggerStay(Collider other)
+    protected void TakeRadiation()
     {
+        List<GameObject> list = Tools.FindNearestsObjects(GameManager.ElementsToCollect, gameObject);
 
-        if (other.gameObject.CompareTag("Radioactif"))
+        foreach (GameObject item in list)
         {
-            if (state == State.malade) return;
-
-            iradiation += 0.1f * Time.deltaTime;
+            if (item.CompareTag("Radioactif"))
+            {
+                float dist = Vector3.Distance(item.transform.position, transform.position);
+                if (dist <= 5)
+                    iradiation += 0.1f * dist * Time.deltaTime * GameManager.instance.radiationMultiplier;
+                else break;
+            }
         }
+
+
     }
+
+    //protected void OnTriggerStay(Collider other)
+    //{
+
+    //    if (other.gameObject.CompareTag("Radioactif"))
+    //    {
+    //        if (state == State.malade) return;
+    //        iradiation += 0.3f * Time.deltaTime;
+    //    }
+    //}
 
 
     protected virtual IEnumerator Interact()
@@ -98,22 +123,28 @@ public class Moveable : MonoBehaviour
     protected virtual void KO()
     {
         state = State.malade;
-        GetComponent<Renderer>().material.color = Color.green;
+        animator.SetTrigger("dead");
 
     }
 
+    //le personnage est guérie
     [ContextMenu("Je suis guéri")]
     public virtual void Heal()
     {
-        Debug.Log("Heal");
         state = State.attent;
         GetComponent<Renderer>().material.color = Color.white;
         iradiation = 0;
-        GameManager.RequireAssistance.Remove(gameObject);
+
+
+        animator.SetTrigger("walk");
     }
 
+    //met a jours les informations concernant les radiations et change l'état du personnag si besoin
     protected virtual void UpdateRadiation()
     {
+        TakeRadiation();
+
+
         if (iradiation >= maxRadiation)
         {
             KO();
@@ -122,7 +153,7 @@ public class Moveable : MonoBehaviour
 
         main.startSize = iradiation / 2;
 
-        if(text)
+        if (text)
             text.text = Math.Round(iradiation, 2, MidpointRounding.AwayFromZero).ToString();
 
     }

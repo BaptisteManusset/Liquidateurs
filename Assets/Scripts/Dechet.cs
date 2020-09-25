@@ -8,15 +8,10 @@ public class Dechet : Interactable
 
     public int quantity = 5;
     public bool isTargeted = false;
-    TextMeshPro text;
 
     private void Awake()
     {
         quantity = Random.Range(4, 10);
-        text = GetComponentInChildren<TextMeshPro>();
-
-        text.text = quantity.ToString();
-
     }
 
     public void EnableToggle()
@@ -29,9 +24,16 @@ public class Dechet : Interactable
     {
         li.stock += quantity;
 
-        text.text = quantity.ToString();
+        if (li.stock > li.stockMax)
+        {
+            int surplus = li.stockMax - li.stockMax;
+            quantity = surplus;
+        }
+        else
+        {
+            quantity = 0;
+        }
 
-        quantity = 0;
     }
 
 

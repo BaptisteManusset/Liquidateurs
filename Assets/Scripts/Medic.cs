@@ -16,6 +16,7 @@ public class Medic : Moveable
 
     private void FixedUpdate()
     {
+        if (state == State.malade || state == State.interagit) return;
 
         if (GameManager.RequireAssistance.Count > 0)
         {
@@ -34,30 +35,10 @@ public class Medic : Moveable
             }
             else
             {
-                StartCoroutine(nameof(Interact));
+                if (state != State.interagit)
+                    StartCoroutine(nameof(Interact));
             }
         }
-
-        //else
-        //{
-        //    if (target.CompareTag("Hopital"))
-        //    {
-
-        //        if (Vector3.Distance(transform.position, GameManager.Destination.position) <= 1)
-        //        {
-        //            target = null;
-        //        }
-        //        else
-        //        {
-        //            Move();
-        //        }
-
-        //    }
-        //    else
-        //    {
-        //        target = GameManager.Hopital;
-        //    }
-        //}
         UpdateRadiation();
     }
 
@@ -68,21 +49,30 @@ public class Medic : Moveable
         {
             Debug.LogError("Aucun personnes a soigner");
             state = State.revient;
+            animator.SetTrigger("idle");
             return;
         }
         target = Tools.FindNearestObject(GameManager.RequireAssistance, gameObject)?.transform;
+        animator.SetTrigger("walk");
+
     }
 
 
     protected override IEnumerator Interact()
     {
-        Debug.Log(target, target.gameObject);
-        //yield return new WaitForSeconds(.2f);
-        yield return null;
+        state = State.interagit;
+        animator.SetTrigger("soigne");
+        yield return new WaitForSeconds(1f);
         Liquidateur obj = target.GetComponent<Liquidateur>();
         if (obj)
+        {
             obj.Heal();
-        target = GameManager.Hopital;
+
+            Debug.Log($"{gameObject.name} soigne { obj.name}", gameObject);
+            target = GameManager.Hopital;
+        }
+        state = State.revient;
+
     }
 
 
