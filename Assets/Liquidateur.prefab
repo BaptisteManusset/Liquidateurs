@@ -113,7 +113,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   state: 0
   iradiation: 0
-  maxRadiation: 2
+  maxRadiation: 0.8
   target: {fileID: 0}
   speed: 5
   stock: 0
